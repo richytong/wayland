@@ -24,9 +24,10 @@ module.exports = _.syncFlow(
       const credentials = x.credentials || y.credentials || (
         grpc.ServerCredentials.createInsecure()
       )
-      (y.hello || x.hello || (() => {
+      const hello = y.hello || x.hello || (() => {
         console.log(`${name} running at ${host}:${port}`)
-      }))()
+      })
+      hello()
       x.server.bind(`${host}:${port}`, credentials)
       x.server.start()
     },

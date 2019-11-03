@@ -1,0 +1,17 @@
+{
+  "name": "make-proto-app",
+  "version": "0.1.0",
+  "description": "Makes a protobuf app",
+  "author": "Richard Tong",
+  "license": "ISC",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "github:richytong/make-proto-app"
+  },
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.2",
+    "fnal": "^0.1.1",
+    "grpc": "^1.24.2"
+  }
+}

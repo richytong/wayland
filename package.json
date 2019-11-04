@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.2",
-    "fnal": "^0.1.1",
-    "grpc": "^1.24.2"
+    "grpc": "^1.24.2",
+    "rubico": "latest"
   }
 }

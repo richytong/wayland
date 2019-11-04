@@ -1,4 +1,4 @@
-const _ = require('fnal')
+const _ = require('rubico')
 const grpc = require('grpc')
 const protoLoader = require('@grpc/proto-loader')
 const uuidv4 = require('uuid/v4')

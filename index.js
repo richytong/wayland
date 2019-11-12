@@ -4,17 +4,76 @@ const protoLoader = require('@grpc/proto-loader')
 
 const wayland = {}
 
-const loadProto = _.syncFlow(protoLoader.loadSync, grpc.loadPackageDefinition)
+const loadProto = _.sflow(protoLoader.loadSync, grpc.loadPackageDefinition)
 
-const makeServer = proto => services => {
+const makeServer = ({ proto, services }) => {
   const server = new grpc.Server()
-  for (k in services) server.addService(proto[k].service, services[k])
+  for (k in services) server.addService(
+    _.lookup(proto)(`${k}.service`),
+    _.lookup(services)(k),
+  )
   return server
 }
 
-wayland.makeApp = _.syncFlow(
+const sanitizeProtoDef = _.sflow(_.split('_'), _.get(1), _.toLowerCase)
+
+const fieldToDocType = _.sflow(
+  x => ({
+    type: sanitizeProtoDef(x.type),
+    label: sanitizeProtoDef(x.label),
+  }),
+  x => x.label === 'repeated' ? [x.type] : x.type,
+)
+
+const protoToDoc = proto => {
+  console.log(proto)
+  const doc = { services: {}, messages: {} }
+  const messageRefs = []
+  for (const n in proto) {
+    console.log('n', n, Object.keys(proto[n]))
+    if (proto[n].service) {
+      doc.services[n] = true
+    }
+    if (proto[n].type) {
+      doc.messages[n] = {}
+      for (const field of proto[n].type.field) {
+        if (sanitizeProtoDef(field.type) === 'message') {
+          messageRefs.push([n, field])
+        } else {
+          doc.messages[n][field.name] = fieldToDocType(field)
+        }
+      }
+      for (const type of proto[n].type.nestedType) {
+        doc.messages[n][type.name] = {}
+        for (const field of type.field) {
+          if (sanitizeProtoDef(field.type) === 'message') {
+            messageRefs.push([n, field])
+          } else {
+            doc.messages[n][type.name][field.name] = fieldToDocType(field)
+          }
+        }
+      }
+      // console.log('field', proto[n].type.field)
+      // console.log('nested type', proto[n].type.nestedType)
+      // console.log('enum type', proto[n].type.enumType)
+    }
+  }
+  for (const [n, field] of messageRefs) {
+    const msg = { ...doc.messages[field.typeName], __ref: field.typeName }
+    doc.messages[n][field.name] = (
+      sanitizeProtoDef(field.label) === 'repeated' ? [msg] : msg
+    )
+  }
+  return doc
+}
+
+wayland.makeApp = _.sflow(
+  _.pick(['protopath', 'services', 'host', 'port']),
   x => ({ ...x, proto: loadProto(x.protopath) }),
-  x => ({ ...x, server: makeServer(x.proto)(x.services) }),
+  x => ({ ...x,
+    server: _.sflow(_.pick(['proto', 'services']), makeServer)(x),
+    doc: _.sflow(_.get('proto'), protoToDoc)(x),
+  }),
   x => ({ ...x,
     start: (y = {}) => {
       const name = y.name || x.name || 'Server'
@@ -33,7 +92,7 @@ wayland.makeApp = _.syncFlow(
   }),
 )
 
-wayland.makeClient = _.syncFlow(
+wayland.makeClient = _.sflow(
   x => ({ ...x, proto: loadProto(x.protopath) }),
   x => new x.proto[x.service](
     `${x.host || 'localhost'}:${x.port || 3000}`,

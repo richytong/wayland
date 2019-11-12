@@ -1,10 +1,11 @@
+const _ = require('rubico')
 const path = require('path')
 const assert = require('assert')
 const wayland = require('..')
 
 describe('make-proto-app', () => {
   before(async () => {
-    wayland.makeApp({
+    const app = wayland.makeApp({
       host: 'localhost',
       port: 3000,
       protopath: path.resolve(__dirname, 'hello.proto'),
@@ -13,7 +14,9 @@ describe('make-proto-app', () => {
           greet: (_, cb) => cb(null, { text: 'hello' })
         },
       },
-    }).start()
+    })
+    console.log(_.prettifyJSON(2)(app.doc))
+    app.start()
   })
 
   after(process.exit)

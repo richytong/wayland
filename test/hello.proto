@@ -8,4 +8,26 @@ message Empty {}
 
 message Greeting {
   string text = 1;
+  double a = 2;
+  repeated float b = 3;
+  int32 c = 4;
+  int64 d = 5;
+  uint32 e = 6;
+  uint64 f = 7;
+  sint32 g = 8;
+  sint64 h = 9;
+  fixed32 i = 10;
+  fixed64 j = 11;
+  sfixed32 k = 12;
+  sfixed64 l = 13;
+  bool m = 14;
+  bytes n = 15;
+  message imNested {
+    string hey = 1;
+  }
+  repeated OutsideMessage messageReference = 16;
+}
+
+message OutsideMessage {
+  string hey = 1;
 }

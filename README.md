@@ -37,3 +37,6 @@ client.greet({}, (err, greeting) => {
   // => ({ text: 'hello' })
 })
 ```
+
+# Docs
+https://github.com/pseudomuto/protoc-gen-doc

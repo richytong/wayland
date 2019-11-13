@@ -5,6 +5,7 @@ const wayland = require('..')
 
 describe('make-proto-app', () => {
   before(async () => {
+    try {
     const app = wayland.makeApp({
       host: 'localhost',
       port: 3000,
@@ -15,8 +16,10 @@ describe('make-proto-app', () => {
         },
       },
     })
-    console.log(_.prettifyJSON(2)(app.doc))
     app.start()
+    } catch (e) {
+      console.error(e)
+    }
   })
 
   after(process.exit)

@@ -1,33 +1,73 @@
 syntax = "proto3";
 
+service NoteService {
+  rpc List (Empty) returns (NoteList);
+  rpc ListStream (Empty) returns (stream Note);
+  rpc Insert (Note) returns (Note);
+  rpc InsertStream (stream Note) returns (NoteList);
+  rpc PassAround (stream Note) returns (stream Note);
+}
+
 service HelloService {
   rpc Greet (Empty) returns (Greeting);
 }
 
 message Empty {}
 
+message Note {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+}
+
+message NoteList {
+  repeated Note notes = 1;
+}
+
 message Greeting {
   string text = 1;
-  double a = 2;
-  repeated float b = 3;
-  int32 c = 4;
-  int64 d = 5;
-  uint32 e = 6;
-  uint64 f = 7;
-  sint32 g = 8;
-  sint64 h = 9;
-  fixed32 i = 10;
-  fixed64 j = 11;
-  sfixed32 k = 12;
-  sfixed64 l = 13;
-  bool m = 14;
-  bytes n = 15;
-  message imNested {
+  double _double = 2;
+  float _float = 3;
+  int32 _int32 = 4;
+  int64 _int64 = 5;
+  uint32 _uint32 = 6;
+  uint64 _uint64 = 7;
+  sint32 _sint32 = 8;
+  sint64 _sint64 = 9;
+  fixed32 _fixed32 = 10;
+  fixed64 _fixed64 = 11;
+  sfixed32 _sfixed32 = 12;
+  sfixed64 _sfixed64 = 13;
+  bool _bool = 14;
+  bytes _bytes = 15;
+  message ImNested {
     string hey = 1;
+    message imNested2 {
+      string hey2 = 1;
+      ImNested fuc = 2;
+    }
   }
+  repeated ImNested imNested = 18;
   repeated OutsideMessage messageReference = 16;
+  repeated MessageModule.NestedOutside nestedMessageRef = 17;
+  enum ABC { a = 0; b = 1; c = 2; }
+  ABC abc = 19;
 }
 
 message OutsideMessage {
   string hey = 1;
+}
+
+message MessageModule {
+  message NestedOutside {
+    string yo = 1;
+  }
+}
+
+message RecurseA {
+  RecurseB recB = 1;
+}
+
+message RecurseB {
+  RecurseA recA = 1;
 }

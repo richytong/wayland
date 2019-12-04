@@ -1,6 +1,6 @@
 {
   "name": "wayland",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "wayland creates protobuf apps and client libraries with gRPC",
   "author": "Richard Tong",
   "license": "ISC",

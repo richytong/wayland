@@ -16,7 +16,7 @@ const makeServer = ({ proto, services }) => {
 }
 
 wayland.makeApp = _.sflow(
-  _.pick(['protopath', 'services', 'host', 'port']),
+  _.pick(['protopath', 'services', 'host', 'port', 'name']),
   x => ({ ...x, proto: loadProto(x.protopath) }),
   x => ({ ...x,
     server: _.sflow(_.pick(['proto', 'services']), makeServer)(x),

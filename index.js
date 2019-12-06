@@ -15,36 +15,32 @@ const makeServer = ({ proto, services }) => {
   return server
 }
 
-wayland.makeApp = _.sflow(
+module.exports = _.sflow(
   _.pick(['protopath', 'services', 'host', 'port', 'name']),
+  x => ({ ...x,
+    name: x.name || 'server',
+    host: x.host || 'localhost',
+    port: x.port || 3000,
+    credentials: grpc.ServerCredentials.createInsecure(),
+  }),
   x => ({ ...x, proto: loadProto(x.protopath) }),
   x => ({ ...x,
     server: _.sflow(_.pick(['proto', 'services']), makeServer)(x),
   }),
   x => ({ ...x,
-    start: (y = {}) => {
-      const name = y.name || x.name || 'Server'
-      const host = y.host || x.host || 'localhost'
-      const port = y.port || x.port || 3000
-      const credentials = x.credentials || y.credentials || (
-        grpc.ServerCredentials.createInsecure()
-      )
-      const hello = y.hello || x.hello || (() => {
+    start: _.sflow(
+      y => ({ ...x, ...y }),
+      ({ name, host, port, credentials }) => {
         console.log(`${name} running at ${host}:${port}`)
-      })
-      hello()
-      x.server.bind(`${host}:${port}`, credentials)
-      x.server.start()
-    },
+        x.server.bind(`${host}:${port}`, credentials)
+        x.server.start()
+      },
+    ),
+    makeClient: _.sflow(
+      y => ({ ...x, ...y, }),
+      ({ service, host, port,
+        clientCredentials = grpc.credentials.createInsecure(),
+      } = {}) => new x.proto[service](`${host}:${port}`, clientCredentials),
+    ),
   }),
 )
-
-wayland.makeClient = _.sflow(
-  x => ({ ...x, proto: loadProto(x.protopath) }),
-  x => new x.proto[x.service](
-    `${x.host || 'localhost'}:${x.port || 3000}`,
-    x.credentials || grpc.credentials.createInsecure(),
-  ),
-)
-
-module.exports = wayland

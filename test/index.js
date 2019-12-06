@@ -4,9 +4,10 @@ const assert = require('assert')
 const wayland = require('..')
 
 describe('make-proto-app', () => {
+  let app
   before(async () => {
     try {
-    const app = wayland.makeApp({
+    app = wayland({
       host: 'localhost',
       port: 3000,
       protopath: path.resolve(__dirname, 'hello.proto'),
@@ -25,10 +26,9 @@ describe('make-proto-app', () => {
   after(process.exit)
 
   it('makes a protobuf app', (done) => {
-    const client = wayland.makeClient({
+    const client = app.makeClient({
       host: 'localhost',
       port: 3000,
-      protopath: path.resolve(__dirname, 'hello.proto'),
       service: 'HelloService',
     })
     client.greet({}, (err, greeting) => {
